@@ -14,6 +14,9 @@
 encode({counter, Key, Value, SampleRate}) ->
     [Key, <<":">>, format_value(Value), <<"|c">>,
         format_sample_rate(SampleRate)];
+encode({counter, Key, Value, Tags, SampleRate}) ->
+    [Key, <<":">>, format_value(Value), <<"|c">>,
+        format_sample_rate(SampleRate), format_tags(Tags)];
 encode({gauge, Key, Value}) ->
     [Key, <<":">>, format_value(Value), <<"|g">>];
 encode({gauge_decrement, Key, Value}) ->
@@ -28,6 +31,14 @@ format_sample_rate(SampleRate) when SampleRate >= 1 ->
     <<>>;
 format_sample_rate(SampleRate) ->
     [<<"|@">>, float_to_list(SampleRate, [compact, {decimals, 6}])].
+
+format_tags([Tag|Tags]) ->
+    format_tags(Tags, [Tag]).
+
+format_tags([], Acc) ->
+    [<<"|#">> | Acc];
+format_tags([Tag|Tags], Acc) ->
+    format_tags(Tags, [Tag, <<", ">> | Acc]).
 
 format_value(Value) when is_integer(Value) ->
     integer_to_list(Value);

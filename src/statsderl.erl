@@ -7,6 +7,7 @@
 %% public
 -export([
     counter/3,
+    counter/4,
     decrement/3,
     gauge/3,
     gauge_decrement/3,
@@ -24,6 +25,18 @@
 
 counter(Key, Value, Rate) ->
     statsderl_sample:rate(Rate, {counter, Key, Value, Rate}).
+
+-spec counter(key(), value(), [tag()] | tag() , sample_rate()) ->
+    ok.
+
+counter(Key, Value, [Tag|_] = Tags, Rate) when  is_list(Tag) or
+                                                is_binary(Tag) ->
+    statsderl_sample:rate(Rate, {counter, Key, Value, Tags, Rate});
+counter(Key, Value, Tag, Rate) ->
+    counter(Key, Value, [Tag], Rate).
+
+
+
 
 -spec decrement(key(), value(), sample_rate()) ->
     ok.
@@ -81,3 +94,4 @@ timing_now(Key, Timestamp, Rate) ->
 
 timing_now_us(Key, Timestamp, Rate) ->
     statsderl_sample:rate(Rate, {timing_now_us, Key, Timestamp}).
+

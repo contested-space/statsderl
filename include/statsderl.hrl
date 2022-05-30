@@ -24,6 +24,7 @@
 -type key() :: iodata().
 -type operation() :: {cast, iodata()} |
                      {counter, key(), value(), sample_rate()} |
+                     {counter, key(), value(), [tag()], sample_rate()} |
                      {gauge, key(), value()} |
                      {gauge_decrement, key(), value()} |
                      {gauge_increment, key(), value()} |
@@ -33,3 +34,4 @@
 -type pool_size() :: pos_integer().
 -type sample_rate() :: number().
 -type value() :: number().
+-type tag() :: iodata().

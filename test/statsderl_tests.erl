@@ -13,6 +13,8 @@ statsderl_test_() ->
         fun (Socket) -> cleanup(Socket) end,
         {with, [
             fun counter_subtest/1,
+            fun counter_tag_subtest/1,
+            fun counter_tags_subtest/1,
             fun decrement_subtest/1,
             fun gauge_decrement_subtest/1,
             fun gauge_increment_subtest/1,
@@ -30,6 +32,16 @@ statsderl_test_() ->
 counter_subtest(Socket) ->
     statsderl:counter("test", 1.123, 1),
     assert_packet(Socket, <<"test:1.12|c">>).
+
+counter_tag_subtest(Socket) ->
+    statsderl:counter("test", 1, <<"key:value">>, 1.0),
+    assert_packet(Socket, <<"test:1|c|#key:value">>).
+
+counter_tags_subtest(Socket) ->
+    statsderl:counter("test", 1, [<<"key1:value1">>,
+        <<"key2:value2">>, <<"key3:value3">>], 1.0),
+    assert_packet(Socket,
+        <<"test:1|c|#key3:value3, key2:value2, key1:value1">>).
 
 decrement_subtest(Socket) ->
     statsderl:decrement("test", 1, 1.0),
